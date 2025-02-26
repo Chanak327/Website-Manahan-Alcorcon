@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookstore UI</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            margin: 0;
+            padding: 0;
+            background: url('https://i.imgur.com/p1T4JVN.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            text-align: center;
+            color: #00FF00;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+        h1 {
+            color: #00FF00;
+        }
+        .book {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 2px solid #00FF00;
+            background: black;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        .book img {
+            max-width: 120px;
+            border-radius: 10px;
+        }
+        .book-details {
+            flex: 1;
+            margin-left: 20px;
+            text-align: left;
+        }
+        .cart-button, .checkout-button, .remove-button {
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .cart-button { background-color: #FFFF00; }
+        .remove-button { background-color: red; color: white; }
+        .checkout-button { background-color: #00FF00; color: black; }
+        .cart-container {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+    </style>
+    <script>
+        let cart = {};
+        
+        function addToCart(bookTitle, price) {
+            if (!cart[bookTitle]) {
+                cart[bookTitle] = { quantity: 0, price: price };
+            }
+            cart[bookTitle].quantity++;
+            updateCartDisplay();
+        }
+
+        function removeFromCart(bookTitle) {
+            if (cart[bookTitle] && cart[bookTitle].quantity > 0) {
+                cart[bookTitle].quantity--;
+                if (cart[bookTitle].quantity === 0) {
+                    delete cart[bookTitle];
+                }
+                updateCartDisplay();
+            }
+        }
+
+        function updateCartDisplay() {
+            let cartContainer = document.getElementById('cart-items');
+            let totalPrice = 0;
+            cartContainer.innerHTML = '';
+            for (let book in cart) {
+                let item = document.createElement('p');
+                item.innerText = `${book} - ${cart[book].quantity} x $${cart[book].price}`;
+                totalPrice += cart[book].quantity * cart[book].price;
+                cartContainer.appendChild(item);
+                
+                let buttonSpan = document.getElementById(`cart-count-${book.replace(/\s+/g, '-')}`);
+                if (buttonSpan) {
+                    buttonSpan.innerText = cart[book].quantity;
+                }
+            }
+            document.getElementById('total-price').innerText = `Total: $${totalPrice.toFixed(2)}`;
+        }
+
+        function proceedToCheckout() {
+            let queryString = encodeURIComponent(JSON.stringify(cart));
+            window.location.href = `receipt.html?cart=${queryString}`;
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the Enchanted Bookstore</h1>
+        <div class="book">
+            <img src="https://i.imgur.com/kTutGKs.png" alt="Harry Potter">
+            <div class="book-details">
+                <p class="book-title">Harry Potter</p>
+                <p>Price: $19.99</p>
+                <button class="cart-button" onclick="addToCart('Harry Potter', 19.99)">Add to Cart (<span id="cart-count-Harry-Potter">0</span>)</button>
+                <button class="remove-button" onclick="removeFromCart('Harry Potter')">Remove</button>
+            </div>
+        </div>
+        <div class="book">
+            <img src="https://i.imgur.com/uy3mDBR.png" alt="Impostor">
+            <div class="book-details">
+                <p class="book-title">Impostor</p>
+                <p>Price: $14.99</p>
+                <button class="cart-button" onclick="addToCart('Impostor', 14.99)">Add to Cart (<span id="cart-count-Impostor">0</span>)</button>
+                <button class="remove-button" onclick="removeFromCart('Impostor')">Remove</button>
+            </div>
+        </div>
+        <div class="book">
+            <img src="https://i.imgur.com/nVDDVzH.png" alt="The Matrix">
+            <div class="book-details">
+                <p class="book-title">The Matrix</p>
+                <p>Price: $24.99</p>
+                <button class="cart-button" onclick="addToCart('The Matrix', 24.99)">Add to Cart (<span id="cart-count-The-Matrix">0</span>)</button>
+                <button class="remove-button" onclick="removeFromCart('The Matrix')">Remove</button>
+            </div>
+        </div>
+        <div class="cart-container">
+            <h2>Shopping Cart</h2>
+            <div id="cart-items"></div>
+            <p id="total-price">Total: $0.00</p>
+            <button class="checkout-button" onclick="proceedToCheckout()">Proceed to Checkout</button>
+        </div>
+    </div>
+</body>
+</html>
